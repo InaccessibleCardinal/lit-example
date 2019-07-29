@@ -1,0 +1,4 @@
+export const REGISTER_FIELD = 'REGISTER_FIELD';
+export const SELECT_ITEM = 'SELECT_ITEM';
+export const RADIO_CHOOSE = 'RADIO_CHOOSE';
+export const UPDATE_FORM_FIELD = 'UPDATE_FORM_FIELD';
