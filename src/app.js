@@ -1,8 +1,9 @@
 import {LitElement, html, css} from 'lit-element';
-import store from './redux/configureStore';
+import './components/UserInfo';
 import './components/SelectTag';
 import './components/RadioGroup';
-import request from './redux/actions/request';
+import './components/Checkbox';
+
 
 const options1 = [
     {value: '', label: ''}, 
@@ -26,33 +27,13 @@ const myRadiosConfig = [
 ];
 
 export class WcApp extends LitElement {
-    static get properties() {
-        return {
-            store: {type: Object},
-            loading: {type: Boolean}
-        };
-    }
-
-    constructor() {
-        super();
-        this.store = store;
-        this.storeState = store.getState();
-    }
-
-    // connectedCallback() {
-    //     super.connectedCallback();
-    // }
 
     render() {
 
         return html`<style>
             ${topLevelStyles()}
         </style>
-        <user-info 
-            .getState="${this.store.getState}"
-            .dispatch="${this.store.dispatch}"
-        >
-        </user-info>
+        <user-info></user-info>
         <div class="form-wrapper">
             <form>
             <div>
@@ -61,7 +42,6 @@ export class WcApp extends LitElement {
                 <div class="form-flex-row">
                     <div class="form-flex-cell">
                         <select-tag 
-                            .store="${this.store}" 
                             fieldLabel="Select 1" 
                             fieldName="selector1" 
                             .options="${options1}"
@@ -69,20 +49,31 @@ export class WcApp extends LitElement {
                     </div>
                     <div class="form-flex-cell">
                         <select-tag 
-                            .store="${this.store}" 
                             fieldLabel="Select 2" 
                             fieldName="selector2" 
                             .options="${options2}"
                         ></select-tag>
                     </div>
                 </div>
-                <radio-group 
-                    .store="${this.store}" 
+                <radio-group
                     fieldLabel="My Radios" 
                     fieldName="radio1" 
                     .radiosConfig=${myRadiosConfig}
                 >
                 </radio-group>
+                <checkbox-el
+                    fieldLabel="My 1st Checkbox"
+                    fieldName="checkbox1"
+                    fieldValue="${true}"
+                >
+                </checkbox-el>
+                <checkbox-el
+                    fieldLabel="My 2nd Checkbox"
+                    fieldName="checkbox2"
+                    fieldValue="somevalue"
+                >
+                </checkbox-el>
+
             </form>
         </div>
         `;
@@ -105,68 +96,4 @@ function topLevelStyles() {
             flex: 1;
         }
     `;
-}
-
-function getUser(state) {
-    return state.services.user;
-}
-
-class UserInfo extends connect(store)(LitElement) {
-    static get properties() {
-        return {
-            user: {type: Object},
-            dispatch: {type: Function}
-        };
-    }
-    constructor() {
-        super();
-        this.user = null;
-    }
-
-    stateChanged(state) {
-        this.user = getUser(state);
-    }
-
-    connectedCallback() {
-        super.connectedCallback();
-        let {dispatch} = this;
-        dispatch({type: 'FETCH_USER'});
-        request({url: 'http://jsonplaceholder.typicode.com/users/2', method: 'GET'})
-        .then(d => {
-            dispatch({type: 'FETCH_USER_SUCCESS', payload: d});
-        });
-    }
-
-    render() {
-        return html`
-            <pre>${JSON.stringify(this.user, null, 2)}</pre>
-        `;
-    }
-}
-customElements.define('user-info', UserInfo);
-
-function connect(storeObj) {
-
-    return function(Component) {
-
-        return class extends LitElement {
-
-            connectedCallback() {
-                if (super.connectedCallback) {
-                    super.connectedCallback();
-                }
-                this._storeUnsubscribe = storeObj.subscribe(() => this.stateChanged(storeObj.getState()));
-                this.stateChanged(storeObj.getState());
-            }
-
-            disconnectedCallback() { //tear down
-                this._storeUnsubscribe();
-                if (super.disconnectedCallback) {
-                  super.disconnectedCallback();
-                }
-            }
-
-        }
-    }
-
 }

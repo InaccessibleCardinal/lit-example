@@ -1,36 +1,39 @@
 import {LitElement, html, css} from 'lit-element';
+import store from '../redux/configureStore';
+import {connect} from '../redux/connect';
 
-export default class RadioGroup extends LitElement {
+export default class RadioGroup extends connect(store)(LitElement) {
     static get properties() {
         return {
             fieldName: {type: String},
             fieldLabel: {type: String},
-            radiosConfig: {type: Array},
-            store: {type: Object}
+            radiosConfig: {type: Array}
         };
     }
 
     constructor() {
         super();
-        this.store = {};
         this.fieldName = '';
         this.fieldLabel = '';
         this.radiosConfig = [];
+        this.dispatch = store.dispatch;
         this.onChange = this.onChange.bind(this);
     }
+    
+    stateChanged(state) {}
 
     connectedCallback() {
         super.connectedCallback();
-        this.store.dispatch({type: 'REGISTER_FIELD', payload: this.fieldName});
+        this.dispatch({type: 'REGISTER_FIELD', payload: this.fieldName});
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.store.dispatch({type: 'UNREGISTER_FIELD', payload: this.fieldName});
+        this.dispatch({type: 'UNREGISTER_FIELD', payload: this.fieldName});
     }
 
     onChange(value) {
-        this.store.dispatch({
+        this.dispatch({
             type: 'UPDATE_FORM_FIELD', 
             payload: {value: value, field: this.fieldName}
         });

@@ -1,34 +1,37 @@
 import {LitElement, html, css} from 'lit-element';
+import store from '../redux/configureStore';
+import {connect} from '../redux/connect';
 
-export default class SelectTag extends LitElement {
+export default class SelectTag extends connect(store)(LitElement) {
     static get properties() {
         return {
             fieldLabel: {type: String},
             fieldName: {type: String},
-            options: {type: Array},
-            store: {type: Object}
+            options: {type: Array}
         };
     }
 
     constructor() {
         super();
-        this.store = {};
         this.fieldName = '';
         this.fieldLabel = '';
+        this.dispatch = store.dispatch;
     }
+
+    stateChanged(state) {}
 
     connectedCallback() {
         super.connectedCallback();
-        this.store.dispatch({type: 'REGISTER_FIELD', payload: this.fieldName});
+        this.dispatch({type: 'REGISTER_FIELD', payload: this.fieldName});
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.store.dispatch({type: 'UNREGISTER_FIELD', payload: this.fieldName});
+        this.dispatch({type: 'UNREGISTER_FIELD', payload: this.fieldName});
     }
 
     handleSelect(e) {
-        this.store.dispatch({
+        this.dispatch({
             type: 'UPDATE_FORM_FIELD', 
             payload: {value: e.target.value, field: this.fieldName}
         });
