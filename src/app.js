@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import store from './redux/configureStore';
 import './components/SelectTag';
 import './components/RadioGroup';
+import request from './redux/actions/request';
 
 const options1 = [
     {value: '', label: ''}, 
@@ -27,7 +28,8 @@ const myRadiosConfig = [
 export class WcApp extends LitElement {
     static get properties() {
         return {
-            store: {type: Object}
+            store: {type: Object},
+            loading: {type: Boolean}
         };
     }
 
@@ -37,10 +39,20 @@ export class WcApp extends LitElement {
         this.storeState = store.getState();
     }
 
+    // connectedCallback() {
+    //     super.connectedCallback();
+    // }
+
     render() {
+
         return html`<style>
             ${topLevelStyles()}
         </style>
+        <user-info 
+            .getState="${this.store.getState}"
+            .dispatch="${this.store.dispatch}"
+        >
+        </user-info>
         <div class="form-wrapper">
             <form>
             <div>
@@ -93,4 +105,68 @@ function topLevelStyles() {
             flex: 1;
         }
     `;
+}
+
+function getUser(state) {
+    return state.services.user;
+}
+
+class UserInfo extends connect(store)(LitElement) {
+    static get properties() {
+        return {
+            user: {type: Object},
+            dispatch: {type: Function}
+        };
+    }
+    constructor() {
+        super();
+        this.user = null;
+    }
+
+    stateChanged(state) {
+        this.user = getUser(state);
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        let {dispatch} = this;
+        dispatch({type: 'FETCH_USER'});
+        request({url: 'http://jsonplaceholder.typicode.com/users/2', method: 'GET'})
+        .then(d => {
+            dispatch({type: 'FETCH_USER_SUCCESS', payload: d});
+        });
+    }
+
+    render() {
+        return html`
+            <pre>${JSON.stringify(this.user, null, 2)}</pre>
+        `;
+    }
+}
+customElements.define('user-info', UserInfo);
+
+function connect(storeObj) {
+
+    return function(Component) {
+
+        return class extends LitElement {
+
+            connectedCallback() {
+                if (super.connectedCallback) {
+                    super.connectedCallback();
+                }
+                this._storeUnsubscribe = storeObj.subscribe(() => this.stateChanged(storeObj.getState()));
+                this.stateChanged(storeObj.getState());
+            }
+
+            disconnectedCallback() { //tear down
+                this._storeUnsubscribe();
+                if (super.disconnectedCallback) {
+                  super.disconnectedCallback();
+                }
+            }
+
+        }
+    }
+
 }
