@@ -7,6 +7,7 @@ export default class SelectTag extends connect(store)(LitElement) {
         return {
             fieldLabel: {type: String},
             fieldName: {type: String},
+            id: {type: String},
             options: {type: Array}
         };
     }
@@ -43,7 +44,7 @@ export default class SelectTag extends connect(store)(LitElement) {
         </style>
             <div class="select-tag-wrapper">
                 <label class="select-label" for="${this.fieldName}">${this.fieldLabel}</label>
-                <select class="select-tag" @change="${this.handleSelect}">
+                <select id="${this.id}" class="select-tag" @change="${this.handleSelect}">
                 ${this.options.map(o => {
                     let {value, label} = o;
                     return html`<option value="${value}">${label}</option>`;

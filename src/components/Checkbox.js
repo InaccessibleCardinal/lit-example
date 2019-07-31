@@ -7,7 +7,8 @@ export default class Checkbox extends connect(store)(LitElement) {
         return {
             fieldName: {type: String},
             fieldLabel: {type: String},
-            fieldValue: {type: String|Boolean}
+            fieldValue: {type: String|Boolean},
+            id: {type: String}
         };
     }
     
@@ -55,6 +56,7 @@ export default class Checkbox extends connect(store)(LitElement) {
     }
 
     render() {
+        let {fieldName, fieldValue, id, onChange} = this;
         return html`<style>
                 ${checkboxStyle()}
             </style>
@@ -62,11 +64,12 @@ export default class Checkbox extends connect(store)(LitElement) {
             <label class="checkbox-label">
                 ${this.renderFieldLabel()}
                 <input 
+                    id="${id}"
                     class="checkbox" 
                     type="checkbox"
-                    name="${this.fieldName}" 
-                    value="${this.fieldValue}" 
-                    @change="${this.onChange}"
+                    name="${fieldName}" 
+                    value="${fieldValue}" 
+                    @change="${onChange}"
                 />
                 <span class="checkmark"></span>
             </div>

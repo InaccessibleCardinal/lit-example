@@ -3,6 +3,7 @@ import './components/UserInfo';
 import './components/SelectTag';
 import './components/RadioGroup';
 import './components/Checkbox';
+import './components/TextInput';
 
 
 const options1 = [
@@ -16,7 +17,7 @@ const options2 = [
     {value: '111', label: 'One'},
     {value: '222', label: 'Two'},
     {value: '333', label: 'Three'},
-    {value: '444', label: 'four'},
+    {value: '444', label: 'Four'},
     {value: '555', label: 'Five'}
 ];
 
@@ -27,6 +28,37 @@ const myRadiosConfig = [
 ];
 
 export class WcApp extends LitElement {
+
+    static get properties() {
+        return {
+            toggleBoolean: {type: Boolean}
+        };
+    }
+
+    constructor() {
+        super();
+        this.toggleBoolean = true;
+    }
+
+    toggle(e) {
+        e.preventDefault();
+        this.toggleBoolean = !this.toggleBoolean;
+    }
+
+    renderConditionalField() {
+        if (this.toggleBoolean) {
+            return html`
+                <text-input
+                    id="text_2"
+                    fieldLabel="My Conditional Text Input"
+                    fieldName="text2"
+                >
+                </text-input>
+            `;
+        } else {
+            return html``;
+        }
+    }
 
     render() {
 
@@ -42,6 +74,7 @@ export class WcApp extends LitElement {
                 <div class="form-flex-row">
                     <div class="form-flex-cell">
                         <select-tag 
+                            id="select_1"
                             fieldLabel="Select 1" 
                             fieldName="selector1" 
                             .options="${options1}"
@@ -49,6 +82,7 @@ export class WcApp extends LitElement {
                     </div>
                     <div class="form-flex-cell">
                         <select-tag 
+                            id="select_2"
                             fieldLabel="Select 2" 
                             fieldName="selector2" 
                             .options="${options2}"
@@ -62,18 +96,29 @@ export class WcApp extends LitElement {
                 >
                 </radio-group>
                 <checkbox-el
+                    id="checkbox_1"
                     fieldLabel="My 1st Checkbox"
                     fieldName="checkbox1"
                     fieldValue="${true}"
                 >
                 </checkbox-el>
                 <checkbox-el
+                    id="checkbox_2"
                     fieldLabel="My 2nd Checkbox"
                     fieldName="checkbox2"
                     fieldValue="somevalue"
                 >
                 </checkbox-el>
-
+                <text-input
+                    id="text_1"
+                    fieldLabel="My Text Input"
+                    fieldName="text1"
+                >
+                </text-input>
+                <div>
+                <button @click="${this.toggle}">Toggle</button>
+                </div>
+                ${this.renderConditionalField()}               
             </form>
         </div>
         `;
